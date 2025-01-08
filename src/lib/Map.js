@@ -16,7 +16,7 @@ export class Map {
 
     this.map = new maplibre.Map({
       container: this.container,
-      style: `https://api.protomaps.com/styles/v4/light/en.json?key=${this.apiKey}`,
+      style: `https://api.protomaps.com/styles/v3/light/en.json?key=${this.apiKey}`,
       center: [4.9041, 52.3676], // Amsterdam center
       zoom: 12
     });

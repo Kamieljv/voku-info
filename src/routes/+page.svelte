@@ -45,10 +45,8 @@
     List
   </button>
 </div>
-
-{#if $currentView === 'map'}
-  <div class="map-container" bind:this={mapContainer}></div>
-{:else}
+<div class="map-container" bind:this={mapContainer}></div>
+{#if $currentView === 'list'}
   <div class="list-container">
     <KitchenList 
       kitchens={$kitchens} 
@@ -80,7 +78,7 @@
 
   .list-container {
     position: absolute;
-    top: 50px;
+    top: 0;
     bottom: 0;
     left: 0;
     right: 0;

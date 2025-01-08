@@ -1,18 +1,24 @@
 import maplibre from 'maplibre-gl';
 
 const pulsingDotHTML = `
-  <div class="pulsing-dot">
+  <div class="marker-container">
     <div class="pulsing-dot-inner"></div>
+    <div class="dot"></div>
   </div>
   <style>
-    .pulsing-dot {
+    .marker-container {
       width: 12px;
       height: 12px;
       position: relative;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      position: absolute;
       background-color: rgb(17, 105, 208);
       border-radius: 50%;
       border: 1px solid gray;
-      z-index: 99;
+      z-index: 2;
     }
     .pulsing-dot-inner {
       width: 12px;

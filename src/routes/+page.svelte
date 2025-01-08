@@ -30,7 +30,7 @@
   onMount(() => {
     map = new maplibre.Map({
       container: mapContainer,
-      style: 'https://demotiles.maplibre.org/style.json',
+      style: 'https://geoserveis.icgc.cat/contextmaps/icgc.json',
       center: [4.9041, 52.3676], // Amsterdam center
       zoom: 12
     });

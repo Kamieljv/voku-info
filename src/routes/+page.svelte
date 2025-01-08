@@ -1,88 +1,66 @@
 <script>
-  import { onMount } from 'svelte';
-  import maplibre from 'maplibre-gl';
+  import { onMount, onDestroy } from 'svelte';
   import 'maplibre-gl/dist/maplibre-gl.css';
   import KitchenDetails from '../components/KitchenDetails.svelte';
   import KitchenList from '../components/KitchenList.svelte';
+  import { Map } from '$lib/Map';
+  import { kitchens, selectedKitchen, currentView } from '$lib/stores';
 
-  let map;
+  let mapInstance;
   let mapContainer;
-  let selectedKitchen = null;
-  let currentView = 'map'; // 'map' or 'list'
-
-  const kitchens = [
-    {
-      id: 1,
-      name: "Voku De Peper",
-      coordinates: [4.8896, 52.3740],
-      address: "Overtoom 301, Amsterdam",
-      openingTimes: {
-        monday: "18:00 - 20:00",
-        wednesday: "18:00 - 20:00",
-        friday: "18:00 - 20:00"
-      },
-      reservationNeeded: true,
-      website: "https://depeper.org"
-    }
-    // Add more kitchens here
-  ];
-
+  
   onMount(() => {
     const apiKey = import.meta.env.VITE_PROTOMAPS_API_KEY;
-    if (!apiKey) {
-      console.error('VITE_PROTOMAPS_API_KEY environment variable is not set');
+    mapInstance = new Map(mapContainer, apiKey);
+    mapInstance.initialize();
+    
+    // Subscribe to kitchen updates to update markers
+    const unsubscribe = kitchens.subscribe($kitchens => {
+      mapInstance.addMarkers($kitchens, kitchen => selectedKitchen.set(kitchen));
+    });
+    
+    return () => {
+      unsubscribe();
+    };
+  });
+
+  onDestroy(() => {
+    if (mapInstance) {
+      mapInstance.destroy();
     }
-
-    map = new maplibre.Map({
-      container: mapContainer,
-      style: `https://api.protomaps.com/styles/v4/light/en.json?key=${apiKey}`,
-      center: [4.9041, 52.3676], // Amsterdam center
-      zoom: 12
-    });
-
-    kitchens.forEach(kitchen => {
-      const marker = new maplibre.Marker()
-        .setLngLat(kitchen.coordinates)
-        .addTo(map);
-
-      marker.getElement().addEventListener('click', () => {
-        selectedKitchen = kitchen;
-      });
-    });
   });
 </script>
 
 <div class="view-toggle">
   <button 
-    class:active={currentView === 'map'} 
-    on:click={() => currentView = 'map'}
+    class:active={$currentView === 'map'} 
+    on:click={() => currentView.set('map')}
   >
     Map
   </button>
   <button 
-    class:active={currentView === 'list'} 
-    on:click={() => currentView = 'list'}
+    class:active={$currentView === 'list'} 
+    on:click={() => currentView.set('list')}
   >
     List
   </button>
 </div>
-{{currentView}}
 
-{#if currentView === 'map'}
+{#if $currentView === 'map'}
   <div class="map-container" bind:this={mapContainer}></div>
 {:else}
   <div class="list-container">
     <KitchenList 
-      {kitchens} 
-      onKitchenSelect={(kitchen) => selectedKitchen = kitchen}
+      kitchens={$kitchens} 
+      onKitchenSelect={(kitchen) => selectedKitchen.set(kitchen)}
     />
   </div>
 {/if}
 
-{#if selectedKitchen}
+{#if $selectedKitchen}
   <KitchenDetails 
-    kitchen={selectedKitchen} 
-    onClose={() => selectedKitchen = null}
+    kitchen={$selectedKitchen} 
+    onClose={() => selectedKitchen.set(null)}
   />
 {/if}
 

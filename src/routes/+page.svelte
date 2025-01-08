@@ -28,9 +28,14 @@
   ];
 
   onMount(() => {
+    const apiKey = import.meta.env.VITE_PROTOMAPS_API_KEY;
+    if (!apiKey) {
+      console.error('VITE_PROTOMAPS_API_KEY environment variable is not set');
+    }
+
     map = new maplibre.Map({
       container: mapContainer,
-      style: 'https://geoserveis.icgc.cat/contextmaps/icgc.json',
+      style: `https://api.protomaps.com/styles/v2/dark.json?key=${apiKey}`,
       center: [4.9041, 52.3676], // Amsterdam center
       zoom: 12
     });

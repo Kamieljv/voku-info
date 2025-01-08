@@ -4,7 +4,7 @@
   import KitchenDetails from '../components/KitchenDetails.svelte';
   import KitchenList from '../components/KitchenList.svelte';
   import { Map } from '$lib/Map';
-  import { kitchens, selectedKitchen, currentView, searchQuery, userLocation } from '$lib/stores';
+  import { kitchens, selectedKitchen, currentView, searchQuery, userLocation, filteredKitchens } from '$lib/stores';
   import { Search, MapPin } from 'lucide-svelte';
 
   let mapInstance;
@@ -30,42 +30,49 @@
       mapInstance.destroy();
     }
   });
+
+  const handleKitchenSelect = (kitchen) => {
+    selectedKitchen.set(kitchen);
+    currentView.set('map');
+  }
 </script>
 
-<div class="side-buttons">
-  <button 
-    class="round-button"
-    on:click={() => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const coords = [position.coords.longitude, position.coords.latitude];
-            userLocation.set(coords);
-            mapInstance.setUserLocation(coords);
-          },
-          (error) => {
-            console.error('Error getting location:', error);
-            alert('Unable to get your location');
-          }
-        );
-      } else {
-        alert('Geolocation is not supported by your browser');
-      }
-    }}
-  >
-    <MapPin size={20} />
-  </button>
-  
-  <button 
-    class="round-button"
-    on:click={() => {
-      const query = prompt('Search kitchens:');
-      if (query) searchQuery.set(query);
-    }}
-  >
-    <Search size={20} />
-  </button>
-</div>
+{#if $currentView === 'map'}
+  <div class="side-buttons">
+    <button 
+      class="round-button"
+      on:click={() => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const coords = [position.coords.longitude, position.coords.latitude];
+              userLocation.set(coords);
+              mapInstance.setUserLocation(coords);
+            },
+            (error) => {
+              console.error('Error getting location:', error);
+              alert('Unable to get your location');
+            }
+          );
+        } else {
+          alert('Geolocation is not supported by your browser');
+        }
+      }}
+    >
+      <MapPin size={20} />
+    </button>
+    
+    <button 
+      class="round-button"
+      on:click={() => {
+        const query = prompt('Search kitchens:');
+        if (query) searchQuery.set(query);
+      }}
+    >
+      <Search size={20} />
+    </button>
+  </div>
+{/if}
 
 <div class="view-toggle">
   <button 
@@ -86,7 +93,7 @@
   <div class="list-container">
     <KitchenList 
       kitchens={$kitchens} 
-      onKitchenSelect={(kitchen) => selectedKitchen.set(kitchen)}
+      onKitchenSelect={handleKitchenSelect}
     />
   </div>
 {/if}
@@ -114,11 +121,13 @@
 
   .list-container {
     position: absolute;
+    height: 100vh;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
     background: #f5f5f5;
+    padding-top: 4rem;
   }
 
   .view-toggle {

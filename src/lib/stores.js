@@ -21,7 +21,7 @@ export const kitchens = writable([
 export const selectedKitchen = writable(null);
 export const currentView = writable('map');
 
-export const filteredKitchens = derived(
+export const filteredKitchens = () => (
   [kitchens, searchQuery],
   ([$kitchens, $searchQuery]) => {
     if (!$searchQuery) return $kitchens;

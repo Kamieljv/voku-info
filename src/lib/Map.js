@@ -7,22 +7,22 @@ const pulsingDotHTML = `
   </div>
   <style>
     .marker-container {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
       position: relative;
     }
     .dot {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       position: absolute;
       background-color: rgb(17, 105, 208);
       border-radius: 50%;
-      border: 1px solid gray;
+      border: 2px solid white;
       z-index: 2;
     }
     .pulsing-dot-inner {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
       background: rgba(74, 144, 226, 0.7);
       border-radius: 50%;
       position: absolute;

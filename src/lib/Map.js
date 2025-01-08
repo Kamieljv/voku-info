@@ -6,17 +6,22 @@ const pulsingDotHTML = `
   </div>
   <style>
     .pulsing-dot {
-      width: 16px;
-      height: 16px;
+      width: 12px;
+      height: 12px;
       position: relative;
+      background-color: rgb(17, 105, 208);
+      border-radius: 50%;
+      border: 1px solid gray;
+      z-index: 99;
     }
     .pulsing-dot-inner {
-      width: 16px;
-      height: 16px;
+      width: 12px;
+      height: 12px;
       background: rgba(74, 144, 226, 0.7);
       border-radius: 50%;
       position: absolute;
       animation: pulse 2s ease-in-out infinite;
+      z-index: 1;
     }
     @keyframes pulse {
       0% {
@@ -24,7 +29,7 @@ const pulsingDotHTML = `
         opacity: 1;
       }
       70% {
-        transform: scale(2);
+        transform: scale(2.5);
         opacity: 0;
       }
       100% {

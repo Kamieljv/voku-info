@@ -1,5 +1,40 @@
 import maplibre from 'maplibre-gl';
 
+const pulsingDotHTML = `
+  <div class="pulsing-dot">
+    <div class="pulsing-dot-inner"></div>
+  </div>
+  <style>
+    .pulsing-dot {
+      width: 16px;
+      height: 16px;
+      position: relative;
+    }
+    .pulsing-dot-inner {
+      width: 16px;
+      height: 16px;
+      background: rgba(74, 144, 226, 0.7);
+      border-radius: 50%;
+      position: absolute;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0% {
+        transform: scale(0.5);
+        opacity: 1;
+      }
+      70% {
+        transform: scale(2);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+    }
+  </style>
+`;
+
 export class Map {
   constructor(container, apiKey) {
     this.map = null;
@@ -49,8 +84,12 @@ export class Map {
       this.userMarker.remove();
     }
     
+    const el = document.createElement('div');
+    el.innerHTML = pulsingDotHTML;
+    
     this.userMarker = new maplibre.Marker({
-      color: '#4A90E2'
+      element: el,
+      anchor: 'center'
     })
       .setLngLat(coordinates)
       .addTo(this.map);

@@ -4,6 +4,7 @@ export class Map {
   constructor(container, apiKey) {
     this.map = null;
     this.markers = [];
+    this.userMarker = null;
     this.container = container;
     this.apiKey = apiKey;
   }
@@ -43,9 +44,29 @@ export class Map {
     this.markers = [];
   }
 
+  setUserLocation(coordinates) {
+    if (this.userMarker) {
+      this.userMarker.remove();
+    }
+    
+    this.userMarker = new maplibre.Marker({
+      color: '#4A90E2'
+    })
+      .setLngLat(coordinates)
+      .addTo(this.map);
+    
+    this.map.flyTo({
+      center: coordinates,
+      zoom: 14
+    });
+  }
+
   destroy() {
     if (this.map) {
       this.clearMarkers();
+      if (this.userMarker) {
+        this.userMarker.remove();
+      }
       this.map.remove();
       this.map = null;
     }

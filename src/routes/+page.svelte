@@ -4,7 +4,8 @@
   import KitchenDetails from '../components/KitchenDetails.svelte';
   import KitchenList from '../components/KitchenList.svelte';
   import { Map } from '$lib/Map';
-  import { kitchens, selectedKitchen, currentView } from '$lib/stores';
+  import { kitchens, selectedKitchen, currentView, searchQuery, userLocation } from '$lib/stores';
+  import { Search, MapPin } from 'lucide-svelte';
 
   let mapInstance;
   let mapContainer;
@@ -15,8 +16,8 @@
     mapInstance.initialize();
     
     // Subscribe to kitchen updates to update markers
-    const unsubscribe = kitchens.subscribe($kitchens => {
-      mapInstance.addMarkers($kitchens, kitchen => selectedKitchen.set(kitchen));
+    const unsubscribe = filteredKitchens.subscribe($filteredKitchens => {
+      mapInstance.addMarkers($filteredKitchens, kitchen => selectedKitchen.set(kitchen));
     });
     
     return () => {
@@ -30,6 +31,41 @@
     }
   });
 </script>
+
+<div class="side-buttons">
+  <button 
+    class="round-button"
+    on:click={() => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const coords = [position.coords.longitude, position.coords.latitude];
+            userLocation.set(coords);
+            mapInstance.setUserLocation(coords);
+          },
+          (error) => {
+            console.error('Error getting location:', error);
+            alert('Unable to get your location');
+          }
+        );
+      } else {
+        alert('Geolocation is not supported by your browser');
+      }
+    }}
+  >
+    <MapPin size={20} />
+  </button>
+  
+  <button 
+    class="round-button"
+    on:click={() => {
+      const query = prompt('Search kitchens:');
+      if (query) searchQuery.set(query);
+    }}
+  >
+    <Search size={20} />
+  </button>
+</div>
 
 <div class="view-toggle">
   <button 
@@ -109,6 +145,35 @@
   .view-toggle button.active {
     background: #4CAF50;
     color: white;
+  }
+
+  .side-buttons {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .round-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+  }
+
+  .round-button:hover {
+    background: #f0f0f0;
   }
 
   :global(.maplibregl-marker) {

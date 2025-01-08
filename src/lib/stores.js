@@ -1,5 +1,7 @@
 import { writable } from 'svelte/store';
 
+export const searchQuery = writable('');
+export const userLocation = writable(null);
 export const kitchens = writable([
   {
     id: 1,
@@ -18,3 +20,19 @@ export const kitchens = writable([
 
 export const selectedKitchen = writable(null);
 export const currentView = writable('map');
+
+export const filteredKitchens = derived(
+  [kitchens, searchQuery],
+  ([$kitchens, $searchQuery]) => {
+    if (!$searchQuery) return $kitchens;
+    
+    const query = $searchQuery.toLowerCase();
+    return $kitchens.filter(kitchen => {
+      return kitchen.name.toLowerCase().includes(query) ||
+             kitchen.address.toLowerCase().includes(query) ||
+             Object.values(kitchen.openingTimes).some(time => 
+               time.toLowerCase().includes(query)
+             );
+    });
+  }
+);

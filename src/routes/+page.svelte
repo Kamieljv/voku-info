@@ -86,6 +86,11 @@
 {/if}
 
 <style>
+  :global(body) {
+    font-family: 'Outfit', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
   .map-container {
     position: absolute;
     top: 0;

@@ -66,6 +66,7 @@
     List
   </button>
 </div>
+{{currentView}}
 
 {#if currentView === 'map'}
   <div class="map-container" bind:this={mapContainer}></div>

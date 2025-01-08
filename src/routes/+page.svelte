@@ -35,7 +35,7 @@
 
     map = new maplibre.Map({
       container: mapContainer,
-      style: `https://api.protomaps.com/styles/v2/dark.json?key=${apiKey}`,
+      style: `https://api.protomaps.com/styles/v4/light/en.json?key=${apiKey}`,
       center: [4.9041, 52.3676], // Amsterdam center
       zoom: 12
     });
@@ -88,7 +88,7 @@
 <style>
   .map-container {
     position: absolute;
-    top: 50px;
+    top: 0;
     bottom: 0;
     left: 0;
     right: 0;

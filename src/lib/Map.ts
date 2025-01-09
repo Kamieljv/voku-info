@@ -67,6 +67,19 @@ export class Map {
       center: [4.9041, 52.3676], // Amsterdam center
       zoom: 12
     });
+
+    // Add click handler to deselect kitchen when clicking on the map
+    this.map.on('click', (e) => {
+      // Check if click was on a marker
+      const features = this.map.queryRenderedFeatures(e.point, {
+        layers: ['markers']
+      });
+      
+      // Only deselect if click was not on a marker
+      if (features.length === 0) {
+        onKitchenSelect(null);
+      }
+    });
   }
 
   addMarkers(kitchens, onKitchenSelect) {

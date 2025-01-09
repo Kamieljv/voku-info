@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   export let kitchen;
   export let onClose;
 
@@ -40,6 +40,7 @@
     right: 0;
     background: white;
     padding: 20px;
+    margin: 0 3px;
     border-radius: 20px 20px 0 0;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     max-height: 90vh;

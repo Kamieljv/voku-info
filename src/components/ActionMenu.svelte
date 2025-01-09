@@ -4,10 +4,9 @@
     import { Search, MapPin } from 'lucide-svelte';
     import SideButton from './SideButton.svelte';
 
-    let { map } = getContext<any>('app');
+    let { map, searchQuery } = getContext<any>('app');
 
     let userLocation: Writable<Array<number>>| undefined = writable([]);
-    let searchQuery: Writable<String> = writable('');
 
     const handleLocation = () => {
         if (navigator.geolocation) {
@@ -56,11 +55,9 @@
     .side-buttons {
         position: fixed;
         left: 20px;
-        top: 50%;
-        transform: translateY(-50%);
+        top: 54px;
         z-index: 1000;
         display: flex;
         flex-direction: column;
-        gap: 10px;
     }
 </style>

@@ -1,124 +1,84 @@
-<script>
-  import { onMount, onDestroy } from 'svelte';
-  import 'maplibre-gl/dist/maplibre-gl.css';
-  import KitchenDetails from '../components/KitchenDetails.svelte';
-  import KitchenList from '../components/KitchenList.svelte';
-  import { Map } from '$lib/Map';
-  import { kitchens, selectedKitchen, currentView, searchQuery, userLocation, filteredKitchens } from '$lib/stores';
-  import { Search, MapPin } from 'lucide-svelte';
+<script lang="ts">
+  import { setContext } from "svelte";
+  import { derived, writable, type Writable } from "svelte/store";
+  import "maplibre-gl/dist/maplibre-gl.css";
+  import ActionMenu from "../components/ActionMenu.svelte";
+  import KitchenDetails from "../components/KitchenDetails.svelte";
+  import KitchenList from "../components/KitchenList.svelte";
+  import Map from "../components/Map.svelte";
+  import {
+    kitchens
+  } from "$lib/stores";
 
-  let mapInstance;
-  let mapContainer;
-  
-  onMount(() => {
-    const apiKey = import.meta.env.VITE_PROTOMAPS_API_KEY;
-    mapInstance = new Map(mapContainer, apiKey);
-    mapInstance.initialize();
-    
-    // Subscribe to kitchen updates to update markers
-    const unsubscribe = filteredKitchens.subscribe($filteredKitchens => {
-      mapInstance.addMarkers($filteredKitchens, kitchen => selectedKitchen.set(kitchen));
-    });
-    
-    return () => {
-      unsubscribe();
-    };
-  });
+  const selectedKitchen = writable(null);
+  const currentView = writable('map');
 
-  onDestroy(() => {
-    if (mapInstance) {
-      mapInstance.destroy();
-    }
-  });
+  let map: Writable<Map | undefined> = writable(undefined);
+  let searchQuery: Writable<String> = writable("");
+
+  setContext("app", { map, searchQuery, selectedKitchen });
 
   const handleKitchenSelect = (kitchen) => {
+    console.log(kitchen)
     selectedKitchen.set(kitchen);
-    currentView.set('map');
-  }
+    currentView.set("map");
+  };
+
+  let filteredKitchens = derived(
+    [kitchens, searchQuery],
+    ([$kitchens, $searchQuery]) => {
+      if (!$searchQuery) return $kitchens;
+      
+      const query = $searchQuery.toLowerCase();
+      return $kitchens.filter(kitchen => {
+        return kitchen.name.toLowerCase().includes(query) ||
+              kitchen.address.toLowerCase().includes(query) ||
+              Object.values(kitchen.openingTimes).some(time => 
+                time.toLowerCase().includes(query)
+              );
+      });
+    }
+  );
 </script>
 
-{#if $currentView === 'map'}
-  <div class="side-buttons">
-    <button 
-      class="round-button"
-      on:click={() => {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const coords = [position.coords.longitude, position.coords.latitude];
-              userLocation.set(coords);
-              mapInstance.setUserLocation(coords);
-            },
-            (error) => {
-              console.error('Error getting location:', error);
-              alert('Unable to get your location');
-            }
-          );
-        } else {
-          alert('Geolocation is not supported by your browser');
-        }
-      }}
-    >
-      <MapPin size={20} />
-    </button>
-    
-    <button 
-      class="round-button"
-      on:click={() => {
-        const query = prompt('Search kitchens:');
-        if (query) searchQuery.set(query);
-      }}
-    >
-      <Search size={20} />
-    </button>
-  </div>
+{#if $currentView === "map"}
+  <ActionMenu />
 {/if}
 
 <div class="view-toggle">
-  <button 
-    class:active={$currentView === 'map'} 
-    on:click={() => currentView.set('map')}
+  <button
+    class:active={$currentView === "map"}
+    on:click={() => currentView.set("map")}
   >
     Map
   </button>
-  <button 
-    class:active={$currentView === 'list'} 
-    on:click={() => currentView.set('list')}
+  <button
+    class:active={$currentView === "list"}
+    on:click={() => currentView.set("list")}
   >
     List
   </button>
 </div>
-<div class="map-container" bind:this={mapContainer}></div>
-{#if $currentView === 'list'}
+<Map filteredKitchens={filteredKitchens} />
+{#if $currentView === "list"}
   <div class="list-container">
-    <KitchenList 
-      kitchens={$kitchens} 
-      onKitchenSelect={handleKitchenSelect}
-    />
+    <KitchenList kitchens={$kitchens} onKitchenSelect={handleKitchenSelect} />
   </div>
 {/if}
 
 {#if $selectedKitchen}
-  <KitchenDetails 
-    kitchen={$selectedKitchen} 
+  <KitchenDetails
+    kitchen={$selectedKitchen}
     onClose={() => selectedKitchen.set(null)}
   />
 {/if}
 
 <style>
   :global(body) {
-    font-family: 'Outfit', sans-serif;
+    font-family: "Outfit", sans-serif;
     margin: 0;
     padding: 0;
   }
-  .map-container {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-
   .list-container {
     position: absolute;
     height: 100vh;
@@ -152,37 +112,8 @@
   }
 
   .view-toggle button.active {
-    background: #4CAF50;
+    background: #4caf50;
     color: white;
-  }
-
-  .side-buttons {
-    position: fixed;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .round-button {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: white;
-    border: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s;
-  }
-
-  .round-button:hover {
-    background: #f0f0f0;
   }
 
   :global(.maplibregl-marker) {

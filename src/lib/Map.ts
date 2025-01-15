@@ -1,5 +1,6 @@
 import maplibre from 'maplibre-gl';
 import { treesGeoJSON } from '$lib/stores';
+import { writable, type Writable } from 'svelte/store';
 import { pulsingDot } from './pulsingDot';
 
 
@@ -7,7 +8,7 @@ export class Map {
 
   map: maplibre.Map | null;
   markers: maplibre.Marker[];
-  selectedMarker: maplibre.Marker | null;
+  selectedFeature: Writable<any>;
   userMarker: maplibre.Marker | null;
   container: string;
   apiKey: string
@@ -15,7 +16,7 @@ export class Map {
   constructor(container: string, apiKey: string) {
     this.map = null;
     this.markers = [];
-    this.selectedMarker = null;
+    this.selectedFeature = writable(null);
     this.userMarker = null;
     this.container = container;
     this.apiKey = apiKey;
@@ -71,8 +72,8 @@ export class Map {
           const feature = e.features[0];
           const tree = feature.properties;
           // Create a custom event that includes the tree data
+          this.selectedFeature.set(feature);
           const event = new CustomEvent('treeclick', { detail: tree });
-          console.log(event);
           this.map.getContainer().dispatchEvent(event);
         }
       });

@@ -1,35 +1,25 @@
 <script lang="ts">
-  export let kitchen;
+  export let tree;
   export let onClose;
-
-  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 </script>
 
 <div class="details-panel">
   <button class="close-button" on:click={onClose}>&times;</button>
   
-  <h2>{kitchen.name}</h2>
-  <p class="address">{kitchen.address}</p>
+  <h2>{tree.species}</h2>
+  <p class="description">{tree.description}</p>
 
-  <h3>Opening Times</h3>
-  <div class="opening-times">
-    {#each days as day}
-      {#if kitchen.openingTimes[day]}
-        <div class="time-slot">
-          <span class="day">{day}</span>
-          <span class="time">{kitchen.openingTimes[day]}</span>
-        </div>
-      {/if}
-    {/each}
+  <div class="tree-info">
+    <h3>Tree Information</h3>
+    <div class="info-item">
+      <span class="label">Age:</span>
+      <span class="value">{tree.age} years</span>
+    </div>
+    <div class="info-item">
+      <span class="label">Location:</span>
+      <span class="value">{tree.coordinates.join(', ')}</span>
+    </div>
   </div>
-
-  <p class="reservation">
-    {kitchen.reservationNeeded ? 'Reservation required' : 'No reservation needed'}
-  </p>
-
-  <a href={kitchen.website} target="_blank" rel="noopener noreferrer" class="website-button">
-    Visit Website
-  </a>
 </div>
 
 <style>

@@ -1,32 +1,32 @@
 <script lang="ts">
-  export let kitchens;
-  export let onKitchenSelect;
+  export let trees;
+  export let onTreeSelect;
 
-  function handleKitchenClick(kitchen) {
-    onKitchenSelect(kitchen);
+  function handleTreeClick(tree) {
+    onTreeSelect(tree);
   }
 </script>
 
-<div class="kitchen-list">
-  {#each kitchens as kitchen}
-    <div class="kitchen-card" on:click={() => handleKitchenClick(kitchen)}>
-      <h3>{kitchen.name}</h3>
-      <p class="address">{kitchen.address}</p>
-      <div class="next-open">
-        Next open: {Object.entries(kitchen.openingTimes)[0]?.[0] || 'Not available'}
+<div class="tree-list">
+  {#each trees as tree}
+    <div class="tree-card" on:click={() => handleTreeClick(tree)}>
+      <h3>{tree.species}</h3>
+      <p class="description">{tree.description}</p>
+      <div class="age">
+        Age: {tree.age} years
       </div>
     </div>
   {/each}
 </div>
 
 <style>
-  .kitchen-list {
+  .tree-list {
     padding: 20px;
     height: 100%;
     overflow-y: auto;
   }
 
-  .kitchen-card {
+  .tree-card {
     background: white;
     border-radius: 8px;
     padding: 15px;

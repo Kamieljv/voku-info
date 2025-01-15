@@ -3,14 +3,14 @@
   import { derived, writable, type Writable } from "svelte/store";
   import "maplibre-gl/dist/maplibre-gl.css";
   import ActionMenu from "../components/ActionMenu.svelte";
-  import KitchenDetails from "../components/KitchenDetails.svelte";
-  import KitchenList from "../components/KitchenList.svelte";
+  import TreeDetails from "../components/TreeDetails.svelte";
+  import TreeList from "../components/TreeList.svelte";
   import Map from "../components/Map.svelte";
   import {
-    kitchens
+    trees
   } from "$lib/stores";
 
-  const selectedKitchen = writable(null);
+  const selectedTree = writable(null);
   const currentView = writable('map');
 
   let map: Writable<Map | undefined> = writable(undefined);
@@ -18,24 +18,22 @@
 
   setContext("app", { map, searchQuery, selectedKitchen });
 
-  const handleKitchenSelect = (kitchen) => {
-    console.log(kitchen)
-    selectedKitchen.set(kitchen);
+  const handleTreeSelect = (tree) => {
+    console.log(tree)
+    selectedTree.set(tree);
     currentView.set("map");
   };
 
-  let filteredKitchens = derived(
-    [kitchens, searchQuery],
-    ([$kitchens, $searchQuery]) => {
-      if (!$searchQuery) return $kitchens;
+  let filteredTrees = derived(
+    [trees, searchQuery],
+    ([$trees, $searchQuery]) => {
+      if (!$searchQuery) return $trees;
       
       const query = $searchQuery.toLowerCase();
-      return $kitchens.filter(kitchen => {
-        return kitchen.name.toLowerCase().includes(query) ||
-              kitchen.address.toLowerCase().includes(query) ||
-              Object.values(kitchen.openingTimes).some(time => 
-                time.toLowerCase().includes(query)
-              );
+      return $trees.filter(tree => {
+        return tree.species.toLowerCase().includes(query) ||
+               tree.description.toLowerCase().includes(query) ||
+               tree.age.toString().includes(query);
       });
     }
   );
@@ -59,17 +57,17 @@
     List
   </button>
 </div>
-<Map filteredKitchens={filteredKitchens} />
+<Map filteredTrees={filteredTrees} />
 {#if $currentView === "list"}
   <div class="list-container">
-    <KitchenList kitchens={$kitchens} onKitchenSelect={handleKitchenSelect} />
+    <TreeList trees={$trees} onTreeSelect={handleTreeSelect} />
   </div>
 {/if}
 
-{#if $selectedKitchen}
-  <KitchenDetails
-    kitchen={$selectedKitchen}
-    onClose={() => selectedKitchen.set(null)}
+{#if $selectedTree}
+  <TreeDetails
+    tree={$selectedTree}
+    onClose={() => selectedTree.set(null)}
   />
 {/if}
 

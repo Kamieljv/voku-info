@@ -1,17 +1,18 @@
 import { writable } from 'svelte/store';
 
-export const kitchens = writable([
+export const trees = writable([
   {
     id: 1,
-    name: "Voku De Peper",
+    species: "Giant Sequoia",
     coordinates: [4.8896, 52.3740],
-    address: "Overtoom 301, Amsterdam",
-    openingTimes: {
-      monday: "18:00 - 20:00",
-      wednesday: "18:00 - 20:00",
-      friday: "18:00 - 20:00"
-    },
-    reservationNeeded: true,
-    website: "https://depeper.org"
+    description: "One of the oldest trees in the park, this Giant Sequoia stands as a testament to time.",
+    age: 150
+  },
+  {
+    id: 2,
+    species: "European Beech",
+    coordinates: [4.8898, 52.3742],
+    description: "A magnificent specimen with a broad, spreading crown.",
+    age: 85
   }
 ]);

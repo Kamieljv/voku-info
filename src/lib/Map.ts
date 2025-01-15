@@ -33,6 +33,49 @@ export class Map {
       zoom: 12
     });
 
+    this.map.on('load', () => {
+      // Add empty GeoJSON source
+      this.map.addSource('trees', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        }
+      });
+
+      // Add circle layer for trees
+      this.map.addLayer({
+        'id': 'tree-points',
+        'type': 'circle',
+        'source': 'trees',
+        'paint': {
+          'circle-radius': 8,
+          'circle-color': '#2E7D32',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#fff'
+        }
+      });
+
+      // Add click handler for tree points
+      this.map.on('click', 'tree-points', (e) => {
+        if (e.features && e.features[0]) {
+          const feature = e.features[0];
+          const tree = feature.properties;
+          // Create a custom event that includes the tree data
+          const event = new CustomEvent('treeclick', { detail: tree });
+          this.map.getContainer().dispatchEvent(event);
+        }
+      });
+
+      // Change cursor on hover
+      this.map.on('mouseenter', 'tree-points', () => {
+        this.map.getCanvas().style.cursor = 'pointer';
+      });
+      this.map.on('mouseleave', 'tree-points', () => {
+        this.map.getCanvas().style.cursor = '';
+      });
+    });
+
     // Add click handler to deselect kitchen when clicking on the map
     // this.map.on('click', (e) => {
     //   // Check if click was on a marker
@@ -47,23 +90,46 @@ export class Map {
     // });
   }
 
-  addMarkers(locations: Array<any>) {
-    this.clearMarkers();
+  addMarkers(trees: Array<any>) {
+    if (!this.map) return;
     
-    locations.forEach(location => {
-      const marker = new maplibre.Marker()
-        .setLngLat(location.coordinates)
-        .addTo(this.map);
+    // Convert trees to GeoJSON
+    const geojson = {
+      type: 'FeatureCollection',
+      features: trees.map(tree => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: tree.coordinates
+        },
+        properties: {
+          id: tree.id,
+          species: tree.species,
+          age: tree.age,
+          description: tree.description,
+          distance: tree.distance
+        }
+      }))
+    };
 
-      marker.getElement().addEventListener('click', (marker) => { this.selectedMarker = marker });
-      
-      this.markers.push(marker);
-    });
+    // Update the source data
+    const source = this.map.getSource('trees');
+    if (source) {
+      (source as maplibre.GeoJSONSource).setData(geojson);
+    }
   }
 
   clearMarkers() {
-    this.markers.forEach(marker => marker.remove());
-    this.markers = [];
+    if (!this.map) return;
+    
+    // Clear the GeoJSON source
+    const source = this.map.getSource('trees');
+    if (source) {
+      (source as maplibre.GeoJSONSource).setData({
+        type: 'FeatureCollection',
+        features: []
+      });
+    }
   }
 
   setUserLocation(coordinates: maplibre.LngLatLike) {

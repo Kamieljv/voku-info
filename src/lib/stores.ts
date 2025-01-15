@@ -22,7 +22,7 @@ if (typeof window !== 'undefined' && 'geolocation' in navigator) {
   });
 }
 
-const trees = writable([
+export const trees = writable([
   {
     id: 1,
     species: "Giant Sequoia",
@@ -56,4 +56,5 @@ export const treesWithDistance = derived(
     }));
   }
 );
+
 

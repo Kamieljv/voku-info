@@ -1,5 +1,5 @@
 import { writable, derived } from 'svelte/store';
-import treeData from '../../trees_amsterdam_oost.geojson';
+import treeData from '../trees_amsterdam_oost.geojson';
 
 // Haversine distance calculation
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -24,18 +24,20 @@ if (typeof window !== 'undefined' && 'geolocation' in navigator) {
 }
 
 
-export const treesGeoJSON = writable(treeData);
+export const trees = writable(treeData);
 
-// Derived store for compatibility with existing code
-export const trees = derived(treesGeoJSON, $geojson => 
-  $geojson.features.map(feature => ({
-    id: feature.properties.id,
-    species: feature.properties.species,
-    coordinates: feature.geometry.coordinates,
-    description: feature.properties.description,
-    age: feature.properties.age
-  }))
-);
+// // Derived store for compatibility with existing code
+// export const trees = derived(treesGeoJSON, $geojson => {
+//   console.log($geojson)
+//   $geojson.features.map(feature => ({
+//     id: feature.properties.id,
+//     species: feature.properties.species,
+//     coordinates: feature.geometry.coordinates,
+//     description: feature.properties.description,
+//     age: feature.properties.age
+//   }))
+// }
+// );
 
 // Trees with calculated distances
 export const treesWithDistance = derived(

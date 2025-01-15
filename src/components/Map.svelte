@@ -3,7 +3,7 @@
     import { Map } from "$lib/Map";
 
     export let filteredTrees;
-    export let onTreeSelect = (tree) => {};
+    export let onTreeSelect;
     let { map, selectedTree } = getContext<any>("app");
     let mapContainer: HTMLDivElement;
     
@@ -20,9 +20,7 @@
 
         // Subscribe to selected feature changes
         const unsubscribeSelected = $map.selectedFeature.subscribe((feature) => {
-            if (feature) {
-                onTreeSelect(feature.properties);
-            }
+            onTreeSelect(feature?.properties);
         });
 
         return () => {

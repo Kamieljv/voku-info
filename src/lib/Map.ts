@@ -1,5 +1,5 @@
 import maplibre from 'maplibre-gl';
-import { treesGeoJSON } from '$lib/stores';
+import { trees } from '$lib/stores';
 import { writable, type Writable } from 'svelte/store';
 import { pulsingDot } from './pulsingDot';
 import { pulsingTreeDot } from './pulsingTreeDot';
@@ -49,7 +49,7 @@ export class Map {
       });
 
       // Subscribe to store updates
-      treesGeoJSON.subscribe(data => {
+      trees.subscribe(data => {
         const source = this.map.getSource('trees');
         if (source) {
           (source as maplibre.GeoJSONSource).setData(data);

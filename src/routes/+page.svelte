@@ -16,10 +16,9 @@
   let map: Writable<Map | undefined> = writable(undefined);
   let searchQuery: Writable<String> = writable("");
 
-  setContext("app", { map, searchQuery, selectedKitchen });
+  setContext("app", { map, searchQuery, selectedTree });
 
   const handleTreeSelect = (tree) => {
-    console.log(tree)
     selectedTree.set(tree);
     currentView.set("map");
   };
@@ -57,7 +56,7 @@
     List
   </button>
 </div>
-<Map filteredTrees={filteredTrees} />
+<Map filteredTrees={filteredTrees} onTreeSelect={handleTreeSelect} />
 {#if $currentView === "list"}
   <div class="list-container">
     <TreeList trees={$trees} onTreeSelect={handleTreeSelect} />

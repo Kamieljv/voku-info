@@ -73,8 +73,6 @@ export class Map {
           const tree = feature.properties;
           // Create a custom event that includes the tree data
           this.selectedFeature.set(feature);
-          const event = new CustomEvent('treeclick', { detail: tree });
-          this.map.getContainer().dispatchEvent(event);
         }
       });
 

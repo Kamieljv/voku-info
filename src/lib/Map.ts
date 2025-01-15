@@ -66,26 +66,17 @@ export class Map {
         }
       });
 
-      // Add click handler for tree points
-      this.map.on('click', 'tree-points', (e) => {
-        if (e.features && e.features[0]) {
-          const feature = e.features[0];
-          const tree = feature.properties;
-          // Create a custom event that includes the tree data
-          this.selectedFeature.set(feature);
-        }
-      });
-
       // Add click handler for map background
       this.map.on('click', (e) => {
         // Check if click was on a tree point
         const features = this.map.queryRenderedFeatures(e.point, 
           { layers: ['tree-points'] }
         );
-        
         // Only deselect if click was not on a tree point
         if (features.length === 0) {
           this.selectedFeature.set(null);
+        } else {
+          this.selectedFeature.set(features[0]);
         }
       });
 

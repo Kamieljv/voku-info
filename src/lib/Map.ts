@@ -76,6 +76,19 @@ export class Map {
         }
       });
 
+      // Add click handler for map background
+      this.map.on('click', (e) => {
+        // Check if click was on a tree point
+        const features = this.map.queryRenderedFeatures(e.point, 
+          { layers: ['tree-points'] }
+        );
+        
+        // Only deselect if click was not on a tree point
+        if (features.length === 0) {
+          this.selectedFeature.set(null);
+        }
+      });
+
       // Change cursor on hover
       this.map.on('mouseenter', 'tree-points', () => {
         this.map.getCanvas().style.cursor = 'pointer';

@@ -3,6 +3,7 @@
     import { Map } from "$lib/Map";
 
     export let filteredTrees;
+    export let onTreeSelect = (tree) => {};
     let { map, selectedTree } = getContext<any>("app");
     let mapContainer: HTMLDivElement;
     
@@ -13,12 +14,20 @@
         $map.initialize();
 
         // Subscribe to tree updates to update markers
-        const unsubscribe = filteredTrees.subscribe(($filteredTrees) => {
+        const unsubscribeFiltered = filteredTrees.subscribe(($filteredTrees) => {
             $map.addMarkers($filteredTrees);
         });
 
+        // Subscribe to selected feature changes
+        const unsubscribeSelected = $map.selectedFeature.subscribe((feature) => {
+            if (feature) {
+                onTreeSelect(feature.properties);
+            }
+        });
+
         return () => {
-            unsubscribe();
+            unsubscribeFiltered();
+            unsubscribeSelected();
         };
     });
 

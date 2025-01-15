@@ -2,8 +2,8 @@
     import { getContext, onDestroy, onMount } from "svelte";
     import { Map } from "$lib/Map";
 
-    export let filteredKitchens;
-    let { map, selectedKitchen } = getContext<any>("app");
+    export let filteredTrees;
+    let { map, selectedTree } = getContext<any>("app");
     let mapContainer: HTMLDivElement;
     
 
@@ -12,11 +12,9 @@
         map.set(new Map(mapContainer, apiKey));
         $map.initialize();
 
-        // Subscribe to kitchen updates to update markers
-        const unsubscribe = filteredKitchens.subscribe(($filteredKitchens) => {
-            $map.addMarkers($filteredKitchens, (kitchen) =>
-                selectedKitchen.set(kitchen),
-            );
+        // Subscribe to tree updates to update markers
+        const unsubscribe = filteredTrees.subscribe(($filteredTrees) => {
+            $map.addMarkers($filteredTrees);
         });
 
         return () => {

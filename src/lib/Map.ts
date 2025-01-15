@@ -1,55 +1,20 @@
 import maplibre from 'maplibre-gl';
+import { pulsingDot } from './pulsingDot';
 
-const pulsingDotHTML = `
-  <div class="marker-container">
-    <div class="pulsing-dot-inner"></div>
-    <div class="dot"></div>
-  </div>
-  <style>
-    .marker-container {
-      width: 14px;
-      height: 14px;
-      position: relative;
-    }
-    .dot {
-      width: 10px;
-      height: 10px;
-      position: absolute;
-      background-color: rgb(17, 105, 208);
-      border-radius: 50%;
-      border: 2px solid white;
-      z-index: 2;
-    }
-    .pulsing-dot-inner {
-      width: 14px;
-      height: 14px;
-      background: rgba(74, 144, 226, 0.7);
-      border-radius: 50%;
-      position: absolute;
-      animation: pulse 2s ease-in-out infinite;
-      z-index: 1;
-    }
-    @keyframes pulse {
-      0% {
-        transform: scale(0.5);
-        opacity: 1;
-      }
-      70% {
-        transform: scale(2.5);
-        opacity: 0;
-      }
-      100% {
-        transform: scale(0.5);
-        opacity: 0;
-      }
-    }
-  </style>
-`;
 
 export class Map {
-  constructor(container, apiKey) {
+
+  map: maplibre.Map | null;
+  markers: maplibre.Marker[];
+  selectedMarker: maplibre.Marker | null;
+  userMarker: maplibre.Marker | null;
+  container: string;
+  apiKey: string
+
+  constructor(container: string, apiKey: string) {
     this.map = null;
     this.markers = [];
+    this.selectedMarker = null;
     this.userMarker = null;
     this.container = container;
     this.apiKey = apiKey;
@@ -69,30 +34,28 @@ export class Map {
     });
 
     // Add click handler to deselect kitchen when clicking on the map
-    this.map.on('click', (e) => {
-      // Check if click was on a marker
-      const features = this.map.queryRenderedFeatures(e.point, {
-        layers: ['markers']
-      });
+    // this.map.on('click', (e) => {
+    //   // Check if click was on a marker
+    //   const features = this.map.queryRenderedFeatures(e.point, 
+    //     { layers: ['markers'] }
+    //   );
       
-      // Only deselect if click was not on a marker
-      if (features.length === 0) {
-        onKitchenSelect(null);
-      }
-    });
+    //   // Only deselect if click was not on a marker
+    //   if (features.length === 0) {
+    //     this.selectedMarker = null;
+    //   }
+    // });
   }
 
-  addMarkers(kitchens, onKitchenSelect) {
+  addMarkers(locations: Array<any>) {
     this.clearMarkers();
     
-    kitchens.forEach(kitchen => {
+    locations.forEach(location => {
       const marker = new maplibre.Marker()
-        .setLngLat(kitchen.coordinates)
+        .setLngLat(location.coordinates)
         .addTo(this.map);
 
-      marker.getElement().addEventListener('click', () => {
-        onKitchenSelect(kitchen);
-      });
+      marker.getElement().addEventListener('click', (marker) => { this.selectedMarker = marker });
       
       this.markers.push(marker);
     });
@@ -103,13 +66,13 @@ export class Map {
     this.markers = [];
   }
 
-  setUserLocation(coordinates) {
+  setUserLocation(coordinates: maplibre.LngLatLike) {
     if (this.userMarker) {
       this.userMarker.remove();
     }
     
     const el = document.createElement('div');
-    el.innerHTML = pulsingDotHTML;
+    el.innerHTML = pulsingDot;
     
     this.userMarker = new maplibre.Marker({
       element: el,

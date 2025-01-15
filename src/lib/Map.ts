@@ -2,6 +2,7 @@ import maplibre from 'maplibre-gl';
 import { treesGeoJSON } from '$lib/stores';
 import { writable, type Writable } from 'svelte/store';
 import { pulsingDot } from './pulsingDot';
+import { pulsingTreeDot } from './pulsingTreeDot';
 
 
 export class Map {
@@ -9,6 +10,7 @@ export class Map {
   map: maplibre.Map | null;
   markers: maplibre.Marker[];
   selectedFeature: Writable<any>;
+  selectedMarker: maplibre.Marker | null;
   userMarker: maplibre.Marker | null;
   container: string;
   apiKey: string
@@ -17,6 +19,7 @@ export class Map {
     this.map = null;
     this.markers = [];
     this.selectedFeature = writable(null);
+    this.selectedMarker = null;
     this.userMarker = null;
     this.container = container;
     this.apiKey = apiKey;
@@ -74,9 +77,29 @@ export class Map {
         );
         // Only deselect if click was not on a tree point
         if (features.length === 0) {
+          if (this.selectedMarker) {
+            this.selectedMarker.remove();
+            this.selectedMarker = null;
+          }
           this.selectedFeature.set(null);
         } else {
           this.selectedFeature.set(features[0]);
+          
+          // Remove previous selected marker if exists
+          if (this.selectedMarker) {
+            this.selectedMarker.remove();
+          }
+          
+          // Create pulsing marker for selected tree
+          const el = document.createElement('div');
+          el.innerHTML = pulsingTreeDot;
+          
+          this.selectedMarker = new maplibre.Marker({
+            element: el,
+            anchor: 'center'
+          })
+            .setLngLat(features[0].geometry.coordinates)
+            .addTo(this.map);
         }
       });
 

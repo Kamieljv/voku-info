@@ -22,22 +22,48 @@ if (typeof window !== 'undefined' && 'geolocation' in navigator) {
   });
 }
 
-export const trees = writable([
-  {
-    id: 1,
-    species: "Giant Sequoia",
-    coordinates: [4.8896, 52.3740],
-    description: "One of the oldest trees in the park, this Giant Sequoia stands as a testament to time.",
-    age: 150
-  },
-  {
-    id: 2,
-    species: "European Beech",
-    coordinates: [4.8898, 52.3742],
-    description: "A magnificent specimen with a broad, spreading crown.",
-    age: 85
-  }
-]);
+export const treesGeoJSON = writable({
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [4.8896, 52.3740]
+      },
+      properties: {
+        id: 1,
+        species: "Giant Sequoia",
+        description: "One of the oldest trees in the park, this Giant Sequoia stands as a testament to time.",
+        age: 150
+      }
+    },
+    {
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [4.8898, 52.3742]
+      },
+      properties: {
+        id: 2,
+        species: "European Beech",
+        description: "A magnificent specimen with a broad, spreading crown.",
+        age: 85
+      }
+    }
+  ]
+});
+
+// Derived store for compatibility with existing code
+export const trees = derived(treesGeoJSON, $geojson => 
+  $geojson.features.map(feature => ({
+    id: feature.properties.id,
+    species: feature.properties.species,
+    coordinates: feature.geometry.coordinates,
+    description: feature.properties.description,
+    age: feature.properties.age
+  }))
+);
 
 // Trees with calculated distances
 export const treesWithDistance = derived(

@@ -1,4 +1,5 @@
 import maplibre from 'maplibre-gl';
+import { treesGeoJSON } from '$lib/stores';
 import { pulsingDot } from './pulsingDot';
 
 
@@ -34,12 +35,20 @@ export class Map {
     });
 
     this.map.on('load', () => {
-      // Add empty GeoJSON source
+      // Add GeoJSON source from store
       this.map.addSource('trees', {
         type: 'geojson',
         data: {
           type: 'FeatureCollection',
           features: []
+        }
+      });
+
+      // Subscribe to store updates
+      treesGeoJSON.subscribe(data => {
+        const source = this.map.getSource('trees');
+        if (source) {
+          (source as maplibre.GeoJSONSource).setData(data);
         }
       });
 
@@ -90,33 +99,10 @@ export class Map {
     // });
   }
 
-  addMarkers(trees: Array<any>) {
-    if (!this.map) return;
-    
-    // Convert trees to GeoJSON
-    const geojson = {
-      type: 'FeatureCollection',
-      features: trees.map(tree => ({
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: tree.coordinates
-        },
-        properties: {
-          id: tree.id,
-          species: tree.species,
-          age: tree.age,
-          description: tree.description,
-          distance: tree.distance
-        }
-      }))
-    };
-
-    // Update the source data
-    const source = this.map.getSource('trees');
-    if (source) {
-      (source as maplibre.GeoJSONSource).setData(geojson);
-    }
+  // Method kept for compatibility but now just a no-op since the source 
+  // is automatically updated via store subscription
+  addMarkers(_trees: Array<any>) {
+    // No-op - data is handled by store subscription
   }
 
   clearMarkers() {

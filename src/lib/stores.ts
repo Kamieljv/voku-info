@@ -22,37 +22,9 @@ if (typeof window !== 'undefined' && 'geolocation' in navigator) {
   });
 }
 
-export const treesGeoJSON = writable({
-  type: 'FeatureCollection',
-  features: [
-    {
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: [4.8896, 52.3740]
-      },
-      properties: {
-        id: 1,
-        species: "Giant Sequoia",
-        description: "One of the oldest trees in the park, this Giant Sequoia stands as a testament to time.",
-        age: 150
-      }
-    },
-    {
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: [4.8898, 52.3742]
-      },
-      properties: {
-        id: 2,
-        species: "European Beech",
-        description: "A magnificent specimen with a broad, spreading crown.",
-        age: 85
-      }
-    }
-  ]
-});
+import treeData from '../../trees_amsterdam_oost.geojson';
+
+export const treesGeoJSON = writable(treeData);
 
 // Derived store for compatibility with existing code
 export const trees = derived(treesGeoJSON, $geojson => 

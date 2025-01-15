@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [sveltekit()],
+	assetsInclude: ['**/*.geojson'],
 	server: {
 		port: 3000,
 		strictPort: false
